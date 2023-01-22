@@ -29,9 +29,10 @@ async function connectRiddle() {
         console.log("connected to mongoDB")
         const db = client.db("Houser");
         const coll = db.collection("riddles");
+        const number = Math.floor(Math.random() * 376)
         const pipeline = [
             { 
-                $match: { Number: "13" } 
+                $match: { Number: number.toString() } 
             },
         ];
         const aggCursor = coll.aggregate(pipeline);
@@ -39,8 +40,7 @@ async function connectRiddle() {
         for await (const doc of aggCursor) {
             result = doc
         }
-        console.log("DOC",result.Question)
-        return result.Question
+        return result
     } catch (error) {
         console.error(error);
     }
