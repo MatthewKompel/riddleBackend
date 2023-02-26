@@ -66,7 +66,7 @@ app.post("/loginUser", async (req,res) => {
             console.log(result)
             const isValid = await bcrypt.compare(req.body.password, result.password);
             if(isValid) {
-                res.send("successful login")
+                res.send(result)
             } else {
                 res.send("Invalid Password")
             }
@@ -76,7 +76,7 @@ app.post("/loginUser", async (req,res) => {
         console.log(result)
         const isValid = await bcrypt.compare(req.body.password, result.password);
         if(isValid) {
-            res.send("successful login")
+            res.send(result)
         } else {
             res.send("Invalid Password")
         }
