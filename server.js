@@ -48,8 +48,30 @@ app.post("/loginUser", async (req,res) => {
     for await (const doc of aggCursor) {
         result = doc
     }
+    console.log("RES",result)
     if(!result) {
-        res.send("Invalid Username")
+        const pipeline2 = [
+            { 
+                $match: { email: req.body.username } 
+            },
+        ]
+        const aggCursor = await coll.aggregate(pipeline2);
+
+        for await (const doc of aggCursor) {
+            result = doc
+        }
+        if(!result) {
+            res.send("Invalid Username or Email")
+        } else {
+            console.log(result)
+            const isValid = await bcrypt.compare(req.body.password, result.password);
+            if(isValid) {
+                res.send("successful login")
+            } else {
+                res.send("Invalid Password")
+            }
+        }
+
     } else {
         console.log(result)
         const isValid = await bcrypt.compare(req.body.password, result.password);
