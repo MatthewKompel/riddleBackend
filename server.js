@@ -96,10 +96,9 @@ async function connectDB(collection) {
 async function connectRiddle() {
     try {
         const coll = await connectDB("riddles")
-        const number = Math.floor(Math.random() * 376)
         const pipeline = [
             { 
-                $match: { Number: number.toString() } 
+                $match: { Status: "current" } 
             },
         ];
         const aggCursor = coll.aggregate(pipeline);
