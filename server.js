@@ -87,7 +87,7 @@ app.post("/loginUser", async (req,res) => {
 
 })
 app.post("/updateStats", async (req,res) => {
-    console.log("REQ",req.body.game_history)
+    console.log("REQ",req.body)
     const user = req.body.userData
     console.log(user.total_plays)
     //** Handle Game History ** 
