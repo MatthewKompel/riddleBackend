@@ -1,6 +1,6 @@
 const {MongoClient} = require('mongodb');
 const express = require("express");
-
+const client = new MongoClient('mongodb+srv://houser2023:Augustine9009@housercluster.yreyshx.mongodb.net/test');
 const app = express();
 var bcrypt = require('bcryptjs');
 var cors = require('cors');
@@ -22,6 +22,7 @@ app.get("/getRiddle", async (req,res) => {
     const riddle = await connectRiddle()
     console.log("RIDDLE",riddle)
     res.send(riddle)
+    client.close()
 })
 
 app.post("/addUser", async (req,res) => {
@@ -29,9 +30,10 @@ app.post("/addUser", async (req,res) => {
     const userPassword = await bcrypt.hash(req.body.password,10)
     const coll = await connectDB("users")
     coll.insertOne({
-        username:"test2",
+        username:"test2", //MAKE THIS DYNAMIC
         password: userPassword
     })
+    client.close()
     res.send("success")
 })
 app.post("/loginUser", async (req,res) => {
@@ -49,7 +51,7 @@ app.post("/loginUser", async (req,res) => {
     for await (const doc of aggCursor) {
         result = doc
     }
-    console.log("RES",result)
+    client.close()
     if(!result) {
         const pipeline2 = [
             { 
@@ -85,21 +87,71 @@ app.post("/loginUser", async (req,res) => {
 
 })
 app.post("/updateStats", async (req,res) => {
-    console.log("REQ",req)
-    
-    // const coll = await connectDB("users")
-    // coll.insertOne({
-    //     username:"test2",
-    //     password: userPassword
-    // })
-    res.send("success")
+    console.log("REQ",req.body.game_history)
+    const user = req.body.userData
+    console.log(user.total_plays)
+    //** Handle Game History ** 
+    const newGame = {
+        num_guesses: req.body.guessCounter,
+        used_hint: req.body.usedHint,
+        solved: req.body.solved
+    }
+    var gameHistory = req.body.game_history
+    gameHistory.push(newGame)
+    console.log("GAME",gameHistory)
+
+    //**Handle Winstreak Info **
+    var newLongestStreak = user.longest_winstreak
+        if (user.longest_winstreak < user.winstreak+1 ) {
+            newLongestStreak = user.winstreak + 1
+        } 
+    const coll = await connectDB("users")
+    if (req.body.solved) {
+        try{
+            const aggCursor = await coll.updateOne(
+                {email: user.email},
+                {$set:{
+                    total_wins: user.total_wins +1,
+                    total_plays: user.total_plays +1,
+                    winstreak: user.winstreak +1,
+                    longest_winstreak: newLongestStreak,
+                    game_history: gameHistory
+                    
+                }}
+            )
+            
+            console.log(aggCursor)
+            
+        } catch(e) {
+            console.log(e)
+            res.send("Error updating stats")
+        }
+    } else {
+        try{
+            const aggCursor = await coll.updateOne(
+                {email: user.email},
+                {$set:{
+                    
+                    total_plays: user.total_plays +1,
+                    winstreak: 0,
+                    game_history: gameHistory
+                    
+                }}
+            )
+            console.log(aggCursor)
+        
+        } catch(e) {
+            console.log(e)
+            res.send("Error updating stats")
+        }
+    }
+    client.close()
+    res.send("Updated")
 })
 
 
 async function connectDB(collection) {
     
-    const uri = "mongodb+srv://houser2023:Augustine9009@housercluster.yreyshx.mongodb.net/test"
-    const client = new MongoClient(uri);
     const res = await client.connect();
     const db = client.db("Houser");
     const coll = db.collection(collection);
