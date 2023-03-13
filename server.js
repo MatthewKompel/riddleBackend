@@ -87,16 +87,16 @@ app.post("/loginUser", async (req,res) => {
 
 })
 app.post("/updateStats", async (req,res) => {
-    console.log("REQ",req.body)
+    console.log(req.body)
     const user = req.body.userData
-    console.log(user.total_plays)
+    
     //** Handle Game History ** 
     const newGame = {
         num_guesses: req.body.guessCounter,
         used_hint: req.body.usedHint,
         solved: req.body.solved
     }
-    var gameHistory = req.body.game_history
+    var gameHistory = user.game_history
     gameHistory.push(newGame)
     console.log("GAME",gameHistory)
 
