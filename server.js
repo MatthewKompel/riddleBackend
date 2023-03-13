@@ -1,5 +1,6 @@
 const {MongoClient} = require('mongodb');
 const express = require("express");
+
 const app = express();
 var bcrypt = require('bcryptjs');
 var cors = require('cors');
@@ -83,8 +84,20 @@ app.post("/loginUser", async (req,res) => {
     }
 
 })
+app.post("/updateStats", async (req,res) => {
+    console.log("REQ",req)
+    
+    // const coll = await connectDB("users")
+    // coll.insertOne({
+    //     username:"test2",
+    //     password: userPassword
+    // })
+    res.send("success")
+})
+
 
 async function connectDB(collection) {
+    
     const uri = "mongodb+srv://houser2023:Augustine9009@housercluster.yreyshx.mongodb.net/test"
     const client = new MongoClient(uri);
     const res = await client.connect();
