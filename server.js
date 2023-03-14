@@ -145,8 +145,21 @@ app.post("/updateStats", async (req,res) => {
             res.send("Error updating stats")
         }
     }
+
+    const pipeline = [
+        { 
+            $match: { email: user.email } 
+        },
+    ];
+
+    const newUser = await coll.aggregate(pipeline)
+    
+    var updatedUser
+    for await (const doc of newUser) {
+        updatedUser = newUser
+    }
     client.close()
-    res.send("Updated")
+    res.send(updatedUser)
 })
 
 
