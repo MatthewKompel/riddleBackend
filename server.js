@@ -156,7 +156,7 @@ app.post("/updateStats", async (req,res) => {
     
     var updatedUser
     for await (const doc of newUser) {
-        updatedUser = newUser
+        updatedUser = doc
     }
     console.log("SENDING",updatedUser)
     client.close()
