@@ -51,7 +51,7 @@ app.post("/loginUser", async (req,res) => {
     for await (const doc of aggCursor) {
         result = doc
     }
-    client.close()
+    
     if(!result) {
         const pipeline2 = [
             { 
@@ -63,6 +63,7 @@ app.post("/loginUser", async (req,res) => {
         for await (const doc of aggCursor) {
             result = doc
         }
+        client.close()
         if(!result) {
             res.send("Invalid Username or Email")
         } else {
